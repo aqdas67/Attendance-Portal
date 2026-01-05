@@ -4,31 +4,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center">
+    android:gravity="center_horizontal">
 
-    <EditText
-        android:id="@+id/studentName"
-        android:hint="Student Name"
+    <!-- Spinner for selecting student -->
+    <Spinner
+        android:id="@+id/studentSpinner"
         android:layout_width="match_parent"
-        android:layout_height="48dp"/>
+        android:layout_height="48dp"
+        android:spinnerMode="dropdown"/>
 
+    <!-- Lecture Number -->
     <EditText
         android:id="@+id/lectureNo"
         android:hint="Lecture Number"
         android:inputType="number"
         android:layout_width="match_parent"
-        android:layout_height="48dp"/>
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"/>
 
+    <Button
+        android:id="@+id/addStudentBtn"
+        android:text="Add New Student"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"/>
+
+
+    <!-- Buttons -->
     <Button
         android:id="@+id/markBtn"
         android:text="Mark Attendance"
         android:layout_width="match_parent"
-        android:layout_height="48dp"/>
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/viewReportBtn"
         android:text="View Attendance Report"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/logoutBtn"
+        android:text="Logout"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="end"/>
 </LinearLayout>

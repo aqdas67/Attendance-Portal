@@ -20,6 +20,9 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE teachers (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT)");
         db.execSQL("CREATE TABLE students (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)");
         db.execSQL("CREATE TABLE attendance (teacher_id INTEGER, student_id INTEGER, lecture_no INTEGER, status TEXT, UNIQUE(teacher_id, student_id, lecture_no))");
+
+        // Insert default 15 students
+        insertDefaultStudents(db);
     }
 
     @Override
@@ -30,44 +33,77 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // -------- Teacher Login --------
-    public int teacherLogin(String username, String password) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT id FROM teachers WHERE username=? AND password=?", new String[]{username, password});
-        if(c.moveToFirst()) return c.getInt(0);
-        return -1;
+    // --- Insert default students (internal) ---
+    private void insertDefaultStudents(SQLiteDatabase db) {
+        String[] students = {"Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace",
+                "Hannah", "Ivy", "Jack", "Kiran", "Liam", "Mia", "Nora", "Oscar"};
+
+        for (String s : students) {
+            ContentValues cv = new ContentValues();
+            cv.put("name", s);
+            db.insertWithOnConflict("students", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
+        }
     }
 
-    // -------- Add Teacher (Run once) --------
-    public void addTeacher(String username, String password) {
+    // --- Insert default students once (callable from activity) ---
+    public void insertDefaultStudentsOnce() {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("username", username);
-        cv.put("password", password);
-        db.insert("teachers", null, cv);
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM students", null);
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+
+        if (count == 0) { // only insert if table is empty
+            insertDefaultStudents(db);
+        }
     }
 
-    // -------- Add teacher for registration (NEW) --------
-    public boolean addTeacherNew(String username, String password){
+    // --- Add teacher (registration) ---
+    public boolean addTeacherNew(String username, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("username", username);
         cv.put("password", password);
         long result = db.insertWithOnConflict("teachers", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
-        return result != -1; // true if inserted, false if username exists
+        return result != -1;
     }
 
-    // -------- Get Student ID (Insert if not exists) --------
+    // --- Teacher login ---
+    public int teacherLogin(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT id FROM teachers WHERE username=? AND password=?", new String[]{username, password});
+        int id = -1;
+        if (c.moveToFirst()) id = c.getInt(0);
+        c.close();
+        return id;
+    }
+
+    // --- Add a new student dynamically ---
+    public boolean addStudent(String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("name", name);
+        long result = db.insertWithOnConflict("students", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
+        return result != -1; // true if added, false if already exists
+    }
+
+    // --- Get student id ---
     private int getStudentId(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery("SELECT id FROM students WHERE name=?", new String[]{name});
-        if(c.moveToFirst()) return c.getInt(0);
-        ContentValues cv = new ContentValues();
-        cv.put("name", name);
-        return (int) db.insert("students", null, cv);
+        int id = -1;
+        if (c.moveToFirst()) id = c.getInt(0);
+        c.close();
+
+        if (id == -1) { // insert if not exists
+            ContentValues cv = new ContentValues();
+            cv.put("name", name);
+            id = (int) db.insert("students", null, cv);
+        }
+        return id;
     }
 
-    // -------- Mark Attendance --------
+    // --- Mark attendance ---
     public void markAttendance(int teacherId, String studentName, int lectureNo, String status) {
         int studentId = getStudentId(studentName);
         SQLiteDatabase db = this.getWritableDatabase();
@@ -79,11 +115,9 @@ public class DBHelper extends SQLiteOpenHelper {
         db.insertWithOnConflict("attendance", null, cv, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
-    // -------- Attendance Report --------
-    // -------- Attendance Report --------
+    // --- Get attendance report per teacher ---
     public Cursor getReport(int teacherId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        // Count how many lectures were marked for each student
         return db.rawQuery(
                 "SELECT s.name, SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END) AS present, COUNT(*) AS total " +
                         "FROM attendance a JOIN students s ON s.id=a.student_id " +
@@ -92,4 +126,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(teacherId)});
     }
 
+    // --- Get all students for spinner ---
+    public Cursor getAllStudents() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT name FROM students ORDER BY name ASC", null);
+    }
+
 }
+
