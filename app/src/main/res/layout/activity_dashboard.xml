@@ -1,54 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:background="@color/white">
 
-    <!-- Spinner for selecting student -->
-    <Spinner
-        android:id="@+id/studentSpinner"
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mark Student Attendance"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Lecture Number Input -->
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:spinnerMode="dropdown"/>
-
-    <!-- Lecture Number -->
-    <EditText
-        android:id="@+id/lectureNo"
+        android:layout_height="wrap_content"
         android:hint="Lecture Number"
-        android:inputType="number"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="16dp"/>
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-    <Button
-        android:id="@+id/addStudentBtn"
-        android:text="Add New Student"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="16dp"/>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/lectureNo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- RecyclerView for Students -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/studentRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:scrollbars="vertical" />
 
     <!-- Buttons -->
-    <Button
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/addStudentBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add New Student"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/purple_500"
+        android:textColor="@color/white" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/markBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Mark Attendance"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/teal_700"
+        android:textColor="@color/white" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/viewReportBtn"
-        android:text="View Attendance Report"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="wrap_content"
+        android:text="View Attendance Report"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/blue_700"
+        android:textColor="@color/white" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/logoutBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Logout"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_gravity="end"/>
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/red_700"
+        android:textColor="@color/white" />
+
 </LinearLayout>

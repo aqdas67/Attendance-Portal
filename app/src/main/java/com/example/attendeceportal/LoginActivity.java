@@ -1,17 +1,18 @@
 package com.example.attendeceportal;
 
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText username, password;
-    Button loginBtn, registerBtn;
+    TextInputEditText username, password;
+    MaterialButton loginBtn, registerBtn;
     DBHelper db;
 
     @Override
@@ -19,6 +20,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // --- UI References ---
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         loginBtn = findViewById(R.id.loginBtn);
@@ -27,12 +29,18 @@ public class LoginActivity extends AppCompatActivity {
 
         // --- LOGIN ---
         loginBtn.setOnClickListener(v -> {
-            int teacherId = db.teacherLogin(
-                    username.getText().toString(),
-                    password.getText().toString()
-            );
+            String user = username.getText().toString().trim();
+            String pass = password.getText().toString().trim();
 
-            if(teacherId != -1){
+            if(user.isEmpty() || pass.isEmpty()){
+                Toast.makeText(this, "Enter username and password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int teacherId = db.teacherLogin(user, pass);
+
+            if (teacherId != -1) {
+                // Login successful, go to dashboard
                 Intent i = new Intent(LoginActivity.this, DashboardActivity.class);
                 i.putExtra("TID", teacherId);
                 startActivity(i);
@@ -44,8 +52,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // --- REGISTER ---
         registerBtn.setOnClickListener(v -> {
-            String user = username.getText().toString();
-            String pass = password.getText().toString();
+            String user = username.getText().toString().trim();
+            String pass = password.getText().toString().trim();
 
             if(user.isEmpty() || pass.isEmpty()){
                 Toast.makeText(this, "Enter username and password", Toast.LENGTH_SHORT).show();
@@ -53,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             boolean success = db.addTeacherNew(user, pass);
+
             if(success){
                 Toast.makeText(this, "Registration Successful! Login now.", Toast.LENGTH_SHORT).show();
             } else {
